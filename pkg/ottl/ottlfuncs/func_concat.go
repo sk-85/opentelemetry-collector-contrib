@@ -35,13 +35,15 @@ func createConcatFunction[K any](_ ottl.FunctionContext, oArgs ottl.Arguments) (
 
 func concat[K any](vals *slicegetter.SliceGetter[K, ottl.StringLikeGetter[K]], delimiter ottl.StringGetter[K]) ottl.ExprFunc[K] {
 	return func(ctx context.Context, tCtx K) (any, error) {
-		builder := strings.Builder{}
 		delimiterVal, err := delimiter.Get(ctx, tCtx)
 		if err != nil {
 			return nil, err
 		}
-		first := true
+
+		var builder strings.Builder
 		var concatErr error
+		first := true
+
 		_, err = vals.Range(ctx, tCtx, func(rv ottl.StringLikeGetter[K]) bool {
 			val, ok, getErr := rv.Get(ctx, tCtx)
 			if getErr != nil {
